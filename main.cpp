@@ -2,5 +2,7 @@
 
 int main()
 {
-    std::cout << "Hello World!" << std::endl;
+    int input;
+    std::cout << "Hello World" << std::endl;
+    std::cin >> input;
 }
