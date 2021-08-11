@@ -1,11 +1,18 @@
+#include <direct.h>
 #include "directory.h"
 
-Directory::Directory(std::string& path)
+Directory::Directory(const std::string& path)
 {
-    
+    // get dirname from path
+    std::string dirName = path.substr(path.find_last_of("/\\") + 1);
+    Directory::dirName = dirName;
+    Directory::path = path;
+
+    // create directory on disk
+    _mkdir(path.c_str());
 }
 
-File* Directory::getFile(std::string& fileName)
+File* Directory::getFile(const std::string& fileName)
 {
     File* fileFound = NULL;
     for(File& file : m_Files) {
@@ -16,7 +23,7 @@ File* Directory::getFile(std::string& fileName)
     return fileFound;
 }
 
-Directory* Directory::getDirectory(std::string& dirName)
+Directory* Directory::getDirectory(const std::string& dirName)
 {
     Directory* dirFound = NULL;
     for(Directory& directory : m_Directories) {
