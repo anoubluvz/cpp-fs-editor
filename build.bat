@@ -1,3 +1,3 @@
 @echo off
-g++ main.cpp -o release.exe
+g++ ./src/main.cpp -o release.exe
 release.exe
