@@ -1,2 +1,1 @@
-h1 simpleDB
-TEST!!
+Simple database coded in C++
