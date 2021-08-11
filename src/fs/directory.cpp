@@ -1,15 +1,17 @@
-#include <direct.h>
 #include "directory.h"
+#include <direct.h>
 
 Directory::Directory(const std::string& path)
 {
     // get dirname from path
-    std::string dirName = path.substr(path.find_last_of("/\\") + 1);
-    Directory::dirName = dirName;
-    Directory::path = path;
+    std::string extractedDirname = path.substr(path.find_last_of("/\\") + 1);
+    dirName = extractedDirname;
+    dirPath = path;
 
+    // todo: check if directory exists and if it does then just read data
+    
     // create directory on disk
-    _mkdir(path.c_str());
+    _mkdir(dirPath.c_str());
 }
 
 File* Directory::getFile(const std::string& fileName)

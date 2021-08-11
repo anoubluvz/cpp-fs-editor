@@ -5,7 +5,7 @@
 
 class Directory {
     public:
-        std::string path;
+        std::string dirPath;
         std::string dirName;
         
         Directory(const std::string& path);

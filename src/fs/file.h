@@ -2,7 +2,7 @@
 
 class File {
     public:
-        std::string path;
+        std::string filePath;
         std::string fileName;
         
         File(const std::string& path, const std::string& data);
