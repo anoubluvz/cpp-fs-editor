@@ -1,7 +1,6 @@
 #include "file.h"
 #include <iostream>
 #include <fstream>
-#include <sys/types.h>
 #include <sys/stat.h>
 
 std::string readFile(const std::string& path)
@@ -14,8 +13,8 @@ std::string readFile(const std::string& path)
 
 bool fileExists(const std::string& path)
 {
-    struct stat info;
-    return (stat(path.c_str(), &info) == 0);
+    struct stat buffer;
+    return (stat(path.c_str(), &buffer) == 0);
 }
 
 File::File(const std::string& path, const std::string& data)
@@ -27,7 +26,7 @@ File::File(const std::string& path, const std::string& data)
 
     std::cout << extractedFilename << std::endl;
 
-    // todo: check if file exists if it exists then read data if not then just create one
+    // check if file exists if it exists then read data if not then just create one
     if(fileExists(path))
     {
         std::cout << "File already exists, Reading data!" << std::endl;
