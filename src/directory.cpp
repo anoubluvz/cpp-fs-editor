@@ -60,48 +60,70 @@ bool Directory::deleteFile(const std::string& fileName)
 {
     for(File file : m_Files)
     {
+        // get file name from stored files and delete it
         if(file.fileName == fileName)
         {
-            if(remove(file.filePath.c_str()) != 0 )
+            FILE* fsFile = NULL;
+            if(fsFile = fopen(file.filePath.c_str(), "r"))
             {
-                std::cout << "Error deleting file: " << file.fileName << std::endl;
+                fclose(fsFile);
+                if(remove(file.filePath.c_str()) != 0 )
+                {
+                    std::cout << "Error deleting file: " << file.fileName << std::endl;
+                }
+                else
+                {
+                    std::cout << "Successfully deleted file: " << file.fileName << std::endl;
+                }
+            }
+            delete fsFile;
+        }
+    }
+}
+
+bool dremove(const char* abs_path)
+{
+    // recursively delete all contents inside directory found
+    struct dirent *entry = NULL;
+    DIR *dir = opendir(abs_path);
+    while(entry = readdir(dir))
+    {
+        DIR *sub_dir = NULL;
+        FILE *file = NULL;
+        if(*(entry->d_name) != '.' || *(entry->d_name) != '..')
+        {
+            // delete directories found
+            if(sub_dir = opendir(abs_path))
+            {
+                closedir(sub_dir);
+                dremove(abs_path);
+            }
+            else
+            {
+                // delete files found
+                if(file = fopen(abs_path, "r"))
+                {
+                    fclose(file);
+                    remove(abs_path);
+                }
             }
         }
+        delete sub_dir;
+        delete file;
     }
 }
 
 bool Directory::deleteDirectory(const std::string& dirName)
 {
+    // find directory in stored directories
     for(auto it = m_Directories.begin(); it != m_Directories.end(); it++)
     {
         Directory m_dir = *it;
         if(m_dir.dirName == dirName)
         {
-            struct dirent *entry = NULL;
-            DIR *dir = opendir(m_dir.dirPath.c_str());
-            while(entry = readdir(dir))
-            {
-                DIR *sub_dir = NULL;
-                FILE *file = NULL;
-                char abs_path[100] = {0};
-                if(*(entry->d_name) != '.' || *(entry->d_name) != '..')
-                {
-                    sprintf(abs_path, "%s/%s",  m_dir.dirPath.c_str(), entry->d_name);
-                    if(sub_dir = opendir(abs_path))
-                    {
-                        closedir(sub_dir);
-                        deleteDirectory(abs_path);
-                    }
-                    else
-                    {
-                        if(file = fopen(abs_path, "r"))
-                        {
-                            fclose(file);
-                            remove(abs_path);
-                        }
-                    }
-                }
-            }
+            char abs_path[100] = {0};
+            sprintf(abs_path, "%s/%s", dirPath, m_dir.dirPath.c_str());
+            dremove(abs_path);
             m_Directories.erase(it);
         }
     }
