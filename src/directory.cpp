@@ -72,8 +72,9 @@ bool Directory::deleteFile(const std::string& fileName)
 
 bool Directory::deleteDirectory(const std::string& dirName)
 {
-    for(Directory m_dir : m_Directories)
+    for(auto it = m_Directories.begin(); it != m_Directories.end(); it++)
     {
+        Directory m_dir = *it;
         if(m_dir.dirName == dirName)
         {
             struct dirent *entry = NULL;
@@ -101,6 +102,7 @@ bool Directory::deleteDirectory(const std::string& dirName)
                     }
                 }
             }
+            m_Directories.erase(it);
         }
     }
 }
