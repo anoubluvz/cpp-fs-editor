@@ -1,1 +1,1 @@
-Simple database coded in C++
+Simple filesystem library coded in C++

@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <iostream>
+#include <stdio.h>
 
 #define NUM_FOLDER 16
 #define NUM_FILE 0
@@ -28,15 +29,22 @@ Directory::Directory(const std::string& path)
         dir = opendir(path.c_str());
         while((buffer = readdir(dir)) != NULL)
         {
-            if(buffer->d_type == NUM_FOLDER)
-            {
-                // folder
-                std::cout << "folder: " << buffer->d_name << std::endl;
-            }
-            else if(buffer->d_type == NUM_FILE)
-            {
-                // file
-                std::cout << "file: " << buffer->d_name << std::endl;
+            if(*(buffer->d_name) != '.' || *(buffer->d_name) != '.') {
+                std::string documentPath = path + "/" + buffer->d_name;
+                if(buffer->d_type == NUM_FOLDER)
+                {
+                    // folder
+                    std::cout << "folder: " << buffer->d_name << std::endl;
+                    Directory newDir(documentPath);
+                    m_Directories.push_back(newDir);
+                }
+                else if(buffer->d_type == NUM_FILE)
+                {
+                    // file
+                    std::cout << "file: " << buffer->d_name << std::endl;
+                    File newFile(documentPath, " ");
+                    m_Files.push_back(newFile);
+                }
             }
         }
         closedir(dir);
@@ -45,6 +53,55 @@ Directory::Directory(const std::string& path)
     {
         // create directory on disk
         _mkdir(dirPath.c_str());
+    }
+}
+
+bool Directory::deleteFile(const std::string& fileName)
+{
+    for(File file : m_Files)
+    {
+        if(file.fileName == fileName)
+        {
+            if(remove(file.filePath.c_str()) != 0 )
+            {
+                std::cout << "Error deleting file: " << file.fileName << std::endl;
+            }
+        }
+    }
+}
+
+bool Directory::deleteDirectory(const std::string& dirName)
+{
+    for(Directory m_dir : m_Directories)
+    {
+        if(m_dir.dirName == dirName)
+        {
+            struct dirent *entry = NULL;
+            DIR *dir = opendir(m_dir.dirPath.c_str());
+            while(entry = readdir(dir))
+            {
+                DIR *sub_dir = NULL;
+                FILE *file = NULL;
+                char abs_path[100] = {0};
+                if(*(entry->d_name) != '.' || *(entry->d_name) != '..')
+                {
+                    sprintf(abs_path, "%s/%s",  m_dir.dirPath.c_str(), entry->d_name);
+                    if(sub_dir = opendir(abs_path))
+                    {
+                        closedir(sub_dir);
+                        deleteDirectory(abs_path);
+                    }
+                    else
+                    {
+                        if(file = fopen(abs_path, "r"))
+                        {
+                            fclose(file);
+                            remove(abs_path);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
